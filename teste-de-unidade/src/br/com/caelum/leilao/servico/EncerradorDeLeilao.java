@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import br.com.caelum.leilao.dominio.Leilao;
+import br.com.caelum.leilao.repositorio.EnviadorDeEmail;
 import br.com.caelum.leilao.repositorio.RepositorioDeLeiloes;
 
 public class EncerradorDeLeilao {
@@ -11,9 +12,11 @@ public class EncerradorDeLeilao {
 	private int total = 0;
 
 	private final RepositorioDeLeiloes dao;
+	private final EnviadorDeEmail carteiro;
 
-	public EncerradorDeLeilao(RepositorioDeLeiloes dao) {
+	public EncerradorDeLeilao(RepositorioDeLeiloes dao, EnviadorDeEmail carteiro) {
 		this.dao = dao;
+		this.carteiro = carteiro;
 	}
 
 	public void encerra() {
@@ -21,9 +24,11 @@ public class EncerradorDeLeilao {
 
 		for (Leilao leilao : todosLeiloesCorrentes) {
 			if (comecouSemanaPassada(leilao)) {
+				System.out.println("oi");
 				leilao.encerra();
 				total++;
 				dao.atualiza(leilao);
+				carteiro.envia(leilao);
 			}
 		}
 	}
@@ -39,7 +44,6 @@ public class EncerradorDeLeilao {
 			data.add(Calendar.DAY_OF_MONTH, 1);
 			diasNoIntervalo++;
 		}
-
 		return diasNoIntervalo;
 	}
 
